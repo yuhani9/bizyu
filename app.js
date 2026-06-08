@@ -1,0 +1,256 @@
+const units = [
+  ["overview", "概要・処理モデル", "可視化の目的、Shneidermanのマントラ、可視化処理の参照モデル。"],
+  ["vision", "視覚の性質", "ゲシュタルト、近接・類同・連結、前注意的処理、錯視。"],
+  ["color", "色", "加法混色・減法混色、色相・彩度・明度、色覚多様性、配色。"],
+  ["data", "データ分類・変換", "量的/質的、構造化、前処理、集計、正規化、欠損。"],
+  ["value", "値・関係の表現", "棒、折れ線、散布図、ヒストグラム、相関、ランキング。"],
+  ["multivar", "多変量・集計", "並行座標、散布図行列、ヒートマップ、ThemeRiver、次元削減。"],
+  ["network", "ネットワーク・階層", "ノードリンク、隣接行列、ツリーマップ、デンドログラム。"],
+  ["geo_time", "地理・時刻", "コロプレス、点地図、時系列、周期性、スパイラルチャート。"]
+];
+
+let nextId = 1;
+
+const bank = [
+  q("review", "single", "overview", "Shneiderman の視覚的情報探索のマントラとして正しいものはどれか。", ["Details first, then overview", "Analyse first, then zoom", "Filter first, analyse later", "Overview first, zoom and filter, then details-on-demand"], [3], "まず全体像を見せ、ズームとフィルタで絞り、必要に応じて詳細を示す。"),
+  q("review", "single", "overview", "可視化処理の参照モデルにおける「加工データ」として最も適切なものはどれか。", ["収集直後の未加工データ", "画像化されたデータ", "可視化に適した形式へ変換されたデータ", "削除予定データ"], [2], "生データをクリーニング、集計、変換したものが加工データ。"),
+  q("review", "single", "overview", "情報可視化 information visualization の対象として最も適切なものはどれか。", ["血流シミュレーション", "CT画像", "顔面顕微画像", "人間関係"], [3], "抽象的な関係、構造、数値などを扱うのが情報可視化。"),
+  q("review", "multi", "vision", "近接の要因について適切と思われるものをすべて選べ。", ["色の類似性のみで成立する", "位置関係が重要となる", "線による接続を意味する", "近い位置にある対象をまとまりとして知覚する"], [1, 3], "近接は空間的に近い要素をグループとして見る性質。色や線だけの話ではない。"),
+  q("review", "single", "color", "減法混色の説明として最も適切なものはどれか。", ["ディスプレイ専用の混色", "光を加える混色", "RGBを基本とする", "インクなどによる光の吸収を利用した混色"], [3], "印刷や絵具では、光を吸収して反射光が減るため減法混色になる。"),
+  q("mock", "single", "color", "加法混色の基本色として最も適切な組み合わせはどれか。", ["CMY", "RGB", "HSV", "Lab"], [1], "ディスプレイの発光は赤・緑・青の加法混色が基本。"),
+  q("mock", "single", "color", "減法混色の基本色として最も適切な組み合わせはどれか。", ["RGB", "XYZ", "CMY", "HSL"], [2], "印刷ではシアン、マゼンタ、イエローを基本に考える。"),
+  q("mock", "multi", "color", "可視化で色を使うときの注意として適切なものをすべて選べ。", ["量の大小を示すときは順序性のある配色が向く", "カテゴリ数が多すぎると色だけでは識別しにくい", "赤と緑だけに頼ると色覚多様性への配慮が不足しやすい", "背景と同じ明度なら必ず見やすい"], [0, 1, 2], "色は強力だが、識別数、明度差、色覚多様性に注意する。"),
+  q("mock", "single", "vision", "前注意的処理として最も説明に近いものはどれか。", ["凡例を読んだ後だけ成立する処理", "意識的探索の前に特定の視覚特徴が素早く目立つ処理", "数式計算による推論", "長文説明の読解"], [1], "色、向き、大きさなどは素早く目に入る特徴になりやすい。"),
+  q("mock", "multi", "vision", "ゲシュタルト要因として扱われるものをすべて選べ。", ["近接", "類同", "良い連続", "データベース正規化"], [0, 1, 2], "近接・類同・連続・閉合などは知覚的まとまりに関係する。"),
+  q("mock", "single", "vision", "類同の要因を最もよく表す説明はどれか。", ["近いものをまとめて見る", "似た色や形のものを同じグループとして見る", "線でつながるものを関連づける", "大きいものを重要視する"], [1], "類同は似ている視覚属性によるグルーピング。"),
+  q("mock", "single", "vision", "連結の要因を利用した表現として最も適切なものはどれか。", ["同じ色だけを使う", "距離を完全に無視する", "点と点を線で結んで関係を示す", "ラベルをすべて非表示にする"], [2], "線で接続された対象は関係があると知覚されやすい。"),
+  q("mock", "multi", "overview", "可視化の目的として適切なものをすべて選べ。", ["大量データの傾向を把握する", "異常値を発見しやすくする", "データの意味を完全に自動決定する", "意思決定を支援する"], [0, 1, 3], "可視化は人間の知覚を活用して探索・理解・判断を支援する。"),
+  q("mock", "single", "overview", "科学的可視化 scientific visualization の対象として最も適切なものはどれか。", ["SNSの友人関係", "企業組織図", "流体シミュレーション結果", "商品カテゴリ表"], [2], "物理空間やシミュレーションの場を扱うものは科学的可視化に近い。"),
+  q("mock", "single", "overview", "情報可視化と科学的可視化の違いとして最も適切なものはどれか。", ["情報可視化は抽象データを扱うことが多い", "科学的可視化は色を使えない", "情報可視化は数値を扱えない", "両者は完全に同じ意味である"], [0], "情報可視化は抽象データや関係構造を視覚表現に写像する。"),
+  q("mock", "multi", "data", "生データから可視化までの処理に含まれやすいものをすべて選べ。", ["欠損値の確認", "集計", "形式変換", "結果をランダムに改ざんする"], [0, 1, 2], "可視化前処理では品質確認、変換、集計などを行う。"),
+  q("mock", "single", "data", "量的データの例として最も適切なものはどれか。", ["血液型", "都道府県名", "売上金額", "商品カテゴリ"], [2], "数値として大小や差を扱えるものが量的データ。"),
+  q("mock", "single", "data", "名義尺度の例として最も適切なものはどれか。", ["身長", "年齢", "満足度1から5", "血液型"], [3], "名義尺度は順序を持たないカテゴリ。"),
+  q("mock", "single", "data", "順序尺度の例として最も適切なものはどれか。", ["郵便番号", "評価ランクA/B/C", "緯度", "売上額"], [1], "順序はあるが間隔の等しさまでは仮定しにくい。"),
+  q("mock", "multi", "data", "可視化前のデータ変換として妥当なものをすべて選べ。", ["単位をそろえる", "外れ値を確認する", "目的に応じて集計粒度を決める", "見栄えのために都合の悪い値を消す"], [0, 1, 2], "前処理は分析目的に沿って透明に行う必要がある。"),
+  q("mock", "single", "value", "カテゴリごとの数量比較に最も向く基本グラフはどれか。", ["棒グラフ", "折れ線グラフ", "ノードリンク図", "地図"], [0], "カテゴリ間の量の比較には棒の長さが読み取りやすい。"),
+  q("mock", "single", "value", "時間に沿った連続的な変化を示すのに最も向く基本グラフはどれか。", ["円グラフ", "折れ線グラフ", "箱ひげ図", "ツリーマップ"], [1], "時系列の推移には折れ線が基本。"),
+  q("mock", "single", "value", "2つの量的変数の関係を見るとき最も基本となる表現はどれか。", ["散布図", "円グラフ", "ワードクラウド", "デンドログラム"], [0], "散布図は2変数の相関やクラスタを見やすい。"),
+  q("mock", "multi", "value", "棒グラフを作るときの注意として適切なものをすべて選べ。", ["軸の基準を誤解させない", "比較対象の順序を工夫する", "棒の面積ではなく長さで比較されることを意識する", "すべて3Dにすると必ず正確になる"], [0, 1, 2], "3D装飾は読み取りを歪めやすい。"),
+  q("mock", "single", "value", "ヒストグラムの目的として最も適切なものはどれか。", ["カテゴリ名の一覧表示", "数値分布の形を把握する", "地点の位置を示す", "階層構造を示す"], [1], "ヒストグラムはビンに分けて分布を示す。"),
+  q("mock", "single", "value", "箱ひげ図で把握しやすいものはどれか。", ["ネットワークの次数", "中央値や四分位範囲", "画像の解像度", "地図上の方位"], [1], "箱ひげ図は分布の要約統計を比較しやすい。"),
+  q("mock", "multi", "value", "相関を見る際の注意として適切なものをすべて選べ。", ["相関は因果をただちに意味しない", "外れ値が見え方を大きく変えることがある", "軸の範囲を確認する", "散布図なら必ず因果関係が証明される"], [0, 1, 2], "可視化は仮説発見に強いが、因果の証明には追加の検討が必要。"),
+  q("mock", "single", "multivar", "多変量データを複数の縦軸で表す手法はどれか。", ["並行座標", "円グラフ", "コロプレス図", "ワッフルチャート"], [0], "並行座標は各変数の軸を並べ、データを折れ線で表す。"),
+  q("mock", "single", "multivar", "散布図行列の説明として最も適切なものはどれか。", ["すべての変数ペアの散布図を格子状に並べる", "地図を格子状に分割する", "階層を長方形で詰め込む", "時刻を円周上に置く"], [0], "複数変数のペア関係を一覧しやすい。"),
+  q("mock", "single", "multivar", "ヒートマップが有効な場面として最も適切なものはどれか。", ["表形式の値の大小を色で俯瞰する", "単一値を正確に読む", "文章の文法を解析する", "3D形状を復元する"], [0], "行列や表のパターン把握に向く。"),
+  q("mock", "multi", "multivar", "次元削減の説明として適切なものをすべて選べ。", ["高次元データを低次元に写像する", "クラスタや近さの概観に使われる", "必ず元データの全情報を完全保存する", "t-SNEやPCAなどが例である"], [0, 1, 3], "次元削減は情報を要約するため、解釈には注意がいる。"),
+  q("mock", "single", "multivar", "ThemeRiver に最も近い用途はどれか。", ["時間に沿った複数カテゴリ量の流れを見る", "緯度経度を正確に測る", "単語の品詞を分類する", "階層を木で表す"], [0], "ThemeRiverは時系列のカテゴリ別量を流れの幅として表す。"),
+  q("mock", "single", "network", "ノードリンク図でノードが表すものとして最も一般的なものはどれか。", ["点や対象", "距離の単位", "色空間", "時間の周期"], [0], "ノードが対象、リンクが関係を表す。"),
+  q("mock", "single", "network", "隣接行列がノードリンク図より有利になりやすい場面はどれか。", ["リンクが多く、交差が増えるネットワーク", "ノード数が2つだけの単純な関係", "地図上の位置が最重要な場合", "時系列だけを扱う場合"], [0], "密なネットワークでは行列のほうが交差問題を避けられる。"),
+  q("mock", "multi", "network", "ネットワーク可視化で注意すべき点をすべて選べ。", ["リンク交差が多いと読みづらい", "レイアウトによって印象が変わる", "次数や中心性などの指標が解釈を助ける", "ノード位置は常に地理座標を意味する"], [0, 1, 2], "力学レイアウトなどの位置は必ずしも実空間を表さない。"),
+  q("mock", "single", "network", "階層データの表現として最も適切なものはどれか。", ["ツリーマップ", "散布図", "ヒストグラム", "レーダーチャート"], [0], "ツリーマップは階層と量を入れ子の長方形で示す。"),
+  q("mock", "single", "network", "デンドログラムが示すものとして最も適切なものはどれか。", ["クラスタリングの階層構造", "地図の投影法", "色の混合方式", "時刻の周期"], [0], "クラスタの分岐構造を木として表す。"),
+  q("mock", "single", "geo_time", "地域ごとの割合や率を塗り分ける地図表現はどれか。", ["コロプレス図", "散布図行列", "箱ひげ図", "円グラフ"], [0], "行政区画などを値に応じて塗る表現。"),
+  q("mock", "multi", "geo_time", "コロプレス図の注意点として適切なものをすべて選べ。", ["面積が大きい地域が強く見えやすい", "絶対数より率のほうが適する場合が多い", "階級区分で印象が変わる", "凡例は不要である"], [0, 1, 2], "地図表現は面積・分類・色設計の影響を受ける。"),
+  q("mock", "single", "geo_time", "地点データを地図上に示す基本表現はどれか。", ["点地図", "箱ひげ図", "並行座標", "隣接行列"], [0], "店舗、観測点、事故地点などは点で示せる。"),
+  q("mock", "single", "geo_time", "周期性のある時系列を強調しやすい表現はどれか。", ["スパイラルチャート", "円グラフ", "ノードリンク図", "ツリーマップ"], [0], "周期を円周方向に置くと繰り返しのパターンが見えやすい。"),
+  q("mock", "multi", "geo_time", "時系列可視化で確認すべき特徴をすべて選べ。", ["トレンド", "季節性や周期性", "急な変化や異常値", "文字コードの種類だけ"], [0, 1, 2], "時系列では傾向、周期、変化点を確認する。"),
+  q("mock", "single", "overview", "details-on-demand の説明として最も適切なものはどれか。", ["最初からすべての詳細を表示する", "必要な対象について追加情報を表示する", "全データを削除する", "ズームを禁止する"], [1], "全体を見た後、関心対象の詳細を求める考え方。"),
+  q("mock", "single", "overview", "filter の役割として最も適切なものはどれか。", ["表示対象を条件で絞り込む", "色を必ず赤にする", "ファイル形式を固定する", "グラフを印刷する"], [0], "フィルタは探索対象を減らして見やすくする。"),
+  q("mock", "single", "overview", "overview の目的として最も適切なものはどれか。", ["全体の構造や分布を把握する", "細部だけを読む", "元データを破棄する", "ユーザー操作を禁止する"], [0], "全体像は探索の出発点。"),
+  q("mock", "multi", "overview", "よいインタラクティブ可視化の要素をすべて選べ。", ["ズーム", "フィルタ", "詳細表示", "意図しない値の改ざん"], [0, 1, 2], "対話操作は探索を支援するが、データ改ざんは不可。"),
+  q("mock", "single", "color", "連続量に向くカラースケールはどれか。", ["順序的なグラデーション", "互いに無関係なランダム色", "赤緑だけの2色", "透明だけ"], [0], "連続量では明度や彩度が段階的に変わる配色が読みやすい。"),
+  q("mock", "single", "color", "中心値からの正負の差を表すときに向く配色はどれか。", ["発散型カラースケール", "名義色だけ", "白一色", "背景色と同色"], [0], "平均より上・下などは中心を挟む発散配色が向く。"),
+  q("mock", "multi", "color", "カテゴリ色の使い方として適切なものをすべて選べ。", ["カテゴリ数を増やしすぎない", "凡例やラベルと対応させる", "順序のない項目には識別しやすい色を使う", "値の大小をランダム色で示す"], [0, 1, 2], "名義カテゴリには区別しやすい色を使い、量には順序的配色を使う。"),
+  q("mock", "single", "vision", "視覚変数のうち、量の比較に比較的強いものはどれか。", ["位置", "模様名", "ランダムな形", "装飾画像"], [0], "共通尺度上の位置は量の比較精度が高い。"),
+  q("mock", "single", "vision", "面積による量表現の注意として最も適切なものはどれか。", ["長さより正確に読み取れるとは限らない", "必ず線グラフより正確", "凡例が不要", "小さい差を強調できないことはない"], [0], "人は面積を長さほど正確に比較しにくい。"),
+  q("mock", "multi", "vision", "見やすさを高める方法として適切なものをすべて選べ。", ["不要な装飾を減らす", "ラベルや凡例を明確にする", "重要な差が見える尺度にする", "軸の意味を隠す"], [0, 1, 2], "読み取りに必要な情報を明確にし、余計な負荷を減らす。"),
+  q("mock", "single", "data", "正規化を行う主な目的として最も適切なものはどれか。", ["尺度の異なる値を比較しやすくする", "データを必ず増やす", "単位を不明にする", "カテゴリ名を削除する"], [0], "異なるスケールの変数をそろえて比較するために使う。"),
+  q("mock", "single", "data", "集計粒度の選択で起こりうる問題として最も適切なものはどれか。", ["細かすぎるとノイズが目立つ", "粗くしても情報は一切失われない", "粒度は解釈に影響しない", "集計すると必ず正確性が上がる"], [0], "粗すぎれば詳細を失い、細かすぎればノイズが見えやすい。"),
+  q("mock", "multi", "data", "欠損値への対応として検討されるものをすべて選べ。", ["欠損の原因を確認する", "分析目的に応じて除外や補完を検討する", "欠損があることを可視化で示す", "常に0に置き換える"], [0, 1, 2], "欠損の扱いは文脈依存で、単純な0置換は危険。"),
+  q("mock", "single", "value", "円グラフが比較的向く場面はどれか。", ["全体に対する少数カテゴリの構成比を大まかに示す", "多変量の相関を見る", "時系列の細かな変化を見る", "ネットワーク構造を示す"], [0], "構成比の概略には使えるが、細かな比較には不向き。"),
+  q("mock", "multi", "value", "円グラフの弱点として適切なものをすべて選べ。", ["角度や面積の比較が難しい", "カテゴリが多いと読みづらい", "近い値の比較に弱い", "構成比を全く表せない"], [0, 1, 2], "円グラフは大まかな構成比向き。細かな比較は棒グラフが向くことが多い。"),
+  q("mock", "single", "value", "ランキングの比較に向く表現はどれか。", ["並べ替えた棒グラフ", "ランダム配置の点", "3D円柱", "背景画像"], [0], "順位順に並べると比較しやすい。"),
+  q("mock", "single", "value", "分布の外れ値を見つけやすい表現はどれか。", ["箱ひげ図", "単一の平均値だけ", "凡例だけ", "タイトルだけ"], [0], "箱ひげ図は外れ値候補を示せる。"),
+  q("mock", "multi", "multivar", "多変量可視化で起きやすい問題をすべて選べ。", ["画面が混雑する", "変数選択で解釈が変わる", "軸順序が見え方に影響する", "変数が増えるほど必ず理解しやすい"], [0, 1, 2], "多変量では情報量と読みやすさのバランスが重要。"),
+  q("mock", "single", "multivar", "レーダーチャートの注意として最も適切なものはどれか。", ["軸の順序や面積が印象を左右する", "相関を完全に証明できる", "地理座標が必要", "時系列専用である"], [0], "レーダーチャートは形の印象に左右されやすい。"),
+  q("mock", "single", "multivar", "ヒートマップでクラスタ構造を見せたいときに併用されやすいものはどれか。", ["行や列の並べ替え", "音声再生", "3D回転", "ファイル圧縮"], [0], "似た行・列を近くに置くとパターンが読みやすい。"),
+  q("mock", "multi", "network", "階層データの表現として適切なものをすべて選べ。", ["木構造図", "ツリーマップ", "サンバースト図", "散布図だけ"], [0, 1, 2], "階層は枝分かれ、入れ子、放射状などで表せる。"),
+  q("mock", "single", "network", "ツリーマップで面積が主に表すものはどれか。", ["各ノードの量", "時刻", "緯度", "色相名"], [0], "入れ子長方形の面積で量を示すことが多い。"),
+  q("mock", "single", "network", "ノードリンク図でリンクが表すものとして最も適切なのはどれか。", ["対象間の関係", "画面の解像度", "色の明度", "値の単位"], [0], "リンクはノード間の関係や接続を示す。"),
+  q("mock", "multi", "network", "階層可視化を選ぶときの観点として適切なものをすべて選べ。", ["親子関係を見たいか", "各部分の量も見たいか", "深さや枝分かれを見たいか", "必ず地図座標を使うか"], [0, 1, 2], "目的に応じて木、ツリーマップ、サンバーストなどを選ぶ。"),
+  q("mock", "single", "geo_time", "点地図で点が重なりすぎる場合の対応として適切なものはどれか。", ["集計メッシュや透明度を使う", "すべて同じ地点に移す", "凡例を削除する", "地図を非表示にする"], [0], "重なりは透明度、密度表現、集計で緩和できる。"),
+  q("mock", "single", "geo_time", "時系列で移動平均を使う主な目的はどれか。", ["短期的な揺れをならし傾向を見やすくする", "値をランダム化する", "地理座標に変換する", "カテゴリ名を増やす"], [0], "移動平均は滑らかにしてトレンドを見やすくする。"),
+  q("mock", "multi", "geo_time", "地理データ可視化で注意することをすべて選べ。", ["投影法による歪み", "面積効果", "位置精度やプライバシー", "色を使うと必ず正確になる"], [0, 1, 2], "地図は直感的だが、投影・面積・精度の影響がある。"),
+  q("mock", "single", "geo_time", "カレンダーヒートマップが向く用途はどれか。", ["日単位の習慣や活動量のパターンを見る", "木構造の親子関係を見る", "ネットワークの最短経路を計算する", "色覚を測定する"], [0], "日付グリッドに値を色で載せると日次パターンが見える。"),
+  q("mock", "single", "overview", "可視化の評価で重視すべき観点として最も適切なものはどれか。", ["目的のタスクを正確かつ効率よく支援できるか", "装飾が多いか", "色数が最大か", "画像が大きいか"], [0], "可視化は目的に対する有効性で評価する。"),
+  q("mock", "multi", "overview", "可視化設計で最初に確認すべきことをすべて選べ。", ["誰が使うか", "どんな判断や探索をしたいか", "どのデータ属性が重要か", "最初から配色だけを決める"], [0, 1, 2], "ユーザー、タスク、データから設計を始める。"),
+  q("mock", "single", "data", "ロング形式のデータが可視化で便利な理由として近いものはどれか。", ["変数名と値を列として持ち、集計やマッピングがしやすい", "画像だけを保存できる", "必ず列数が1になる", "欠損が自動で消える"], [0], "tidy dataの考え方に近く、可視化ライブラリと相性がよい。"),
+  q("mock", "single", "data", "ワイド形式の説明として最も近いものはどれか。", ["複数の測定項目が別々の列に並ぶ形式", "地図だけの形式", "色だけを保存する形式", "1行に必ず1文字だけ入る形式"], [0], "ワイド形式は表計算では見やすいが、可視化前に変換することも多い。"),
+  q("mock", "multi", "value", "誤解を招きやすいグラフ表現をすべて選べ。", ["不自然に切られた軸", "過剰な3D効果", "比較対象の非表示", "単位が明記されたシンプルな軸"], [0, 1, 2], "軸、単位、比較対象が曖昧だと誤読につながる。"),
+  q("mock", "single", "color", "明度差を確保する主な理由はどれか。", ["白黒印刷や色覚差があっても読み取りやすくするため", "必ず派手にするため", "データ数を増やすため", "軸を不要にするため"], [0], "色相だけでなく明度差があると頑健になる。"),
+  q("mock", "single", "vision", "チャートジャンクの説明として近いものはどれか。", ["読み取りに寄与しない過剰装飾", "データの単位", "軸ラベル", "凡例"], [0], "不要な装飾は認知負荷を上げ、読み取りを妨げる。"),
+  q("mock", "multi", "multivar", "ThemeRiverを読むときに注目する点をすべて選べ。", ["流れの幅の変化", "カテゴリ間の増減", "時間方向のトレンド", "緯度経度の精度"], [0, 1, 2], "流れの幅がカテゴリ量を表し、時間変化を読む。"),
+  q("mock", "single", "geo_time", "スパイラルチャートで円周方向に置かれることが多いものはどれか。", ["周期", "ノード次数", "階層の深さ", "色相の名前だけ"], [0], "周期性を円周に対応させると繰り返しが見える。"),
+  q("mock", "single", "network", "ネットワークの中心性指標が役立つ目的はどれか。", ["重要そうなノードを見つける", "色を混ぜる", "時系列を平滑化する", "地図投影を選ぶ"], [0], "中心性は接続の多さや橋渡しの度合いを示す指標。"),
+  q("mock", "multi", "overview", "受験レビューの出題傾向として近い形式をすべて選べ。", ["最も適切なものを1つ選ぶ", "適切なものをすべて選ぶ", "用語と説明の対応を問う", "長大な証明問題だけ"], [0, 1, 2], "レビューでは選択肢式で概念理解を問う問題が中心。")
+];
+
+function q(source, type, unit, text, options, answers, explanation) {
+  return { id: nextId++, source, type, unit, text, options, answers, explanation };
+}
+
+let current = [];
+let graded = new Map();
+let missed = JSON.parse(localStorage.getItem("vizMissed") || "[]");
+
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => [...document.querySelectorAll(sel)];
+const unitName = (id) => units.find((u) => u[0] === id)?.[1] || id;
+
+function sample(arr, n) {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy.slice(0, Math.min(n, copy.length));
+}
+
+function normalizedQuestion(item) {
+  const pairs = item.options.map((text, index) => ({ text, original: index }));
+  const shuffled = $("#shuffleOptions").checked ? sample(pairs, pairs.length) : pairs;
+  return { ...item, displayOptions: shuffled, displayAnswers: shuffled.map((p, i) => item.answers.includes(p.original) ? i : -1).filter(i => i >= 0) };
+}
+
+function buildSet() {
+  const mode = $("#modeSelect").value;
+  const count = Number($("#countInput").value || 20);
+  const selectedUnit = $("#unitSelect").value;
+  let pool = bank;
+  if (mode === "review") pool = bank.filter(x => x.source === "review" || x.text.includes("最も適切") || x.text.includes("すべて選べ"));
+  if (mode === "unit") pool = bank.filter(x => x.unit === selectedUnit);
+  if (mode === "missed") pool = bank.filter(x => missed.includes(x.text));
+  if (!pool.length) pool = bank;
+  current = sample(pool, count).map(normalizedQuestion);
+  graded.clear();
+  renderQuiz();
+}
+
+function renderQuiz() {
+  const form = $("#quizForm");
+  form.innerHTML = "";
+  current.forEach((item, index) => {
+    const node = $("#questionTemplate").content.cloneNode(true);
+    const card = node.querySelector(".question-card");
+    card.dataset.index = index;
+    node.querySelector(".badge").textContent = item.type === "multi" ? "複数選択" : "単一選択";
+    node.querySelector(".unit").textContent = unitName(item.unit);
+    node.querySelector("h2").textContent = `${index + 1}. ${item.text}`;
+    node.querySelector(".hint").textContent = item.type === "multi" ? "適切な選択肢をすべて選んでください。" : "最も適切な選択肢を1つ選んでください。";
+    const opts = node.querySelector(".options");
+    item.displayOptions.forEach((opt, optIndex) => {
+      const label = document.createElement("label");
+      label.className = "option";
+      const input = document.createElement("input");
+      input.type = item.type === "multi" ? "checkbox" : "radio";
+      input.name = `q-${index}`;
+      input.value = optIndex;
+      input.addEventListener("change", () => {
+        if ($("#instantCheck").checked) gradeOne(index);
+        updateProgress();
+      });
+      label.append(input, document.createTextNode(opt.text));
+      opts.append(label);
+    });
+    form.append(node);
+  });
+  $("#modeLabel").textContent = $("#modeSelect").selectedOptions[0].textContent;
+  updateProgress();
+}
+
+function selected(index) {
+  return $$(`[name="q-${index}"]:checked`).map(x => Number(x.value)).sort((a, b) => a - b);
+}
+
+function same(a, b) {
+  return a.length === b.length && a.every((v, i) => v === b[i]);
+}
+
+function gradeOne(index) {
+  const item = current[index];
+  const card = $(`.question-card[data-index="${index}"]`);
+  const got = selected(index);
+  const answer = [...item.displayAnswers].sort((a, b) => a - b);
+  const ok = same(got, answer);
+  graded.set(index, ok);
+  card.querySelectorAll(".option").forEach((label, optIndex) => {
+    label.classList.toggle("correct", answer.includes(optIndex));
+    label.classList.toggle("wrong", got.includes(optIndex) && !answer.includes(optIndex));
+  });
+  const fb = card.querySelector(".feedback");
+  fb.hidden = false;
+  fb.className = `feedback ${ok ? "ok" : "bad"}`;
+  const letters = answer.map(i => String.fromCharCode(97 + i)).join(", ");
+  fb.textContent = `${ok ? "正解" : "不正解"}。正答: ${letters}。${item.explanation}`;
+  persistMiss(item.text, !ok);
+}
+
+function gradeAll() {
+  current.forEach((_, i) => gradeOne(i));
+  updateProgress();
+}
+
+function persistMiss(text, isMiss) {
+  const set = new Set(missed);
+  if (isMiss) set.add(text);
+  else set.delete(text);
+  missed = [...set];
+  localStorage.setItem("vizMissed", JSON.stringify(missed));
+}
+
+function updateProgress() {
+  const answered = current.filter((_, i) => selected(i).length).length;
+  const correct = [...graded.values()].filter(Boolean).length;
+  $("#progressLabel").textContent = current.length ? `${answered} / ${current.length} 問回答` : "未開始";
+  $("#progressBar").style.width = current.length ? `${answered / current.length * 100}%` : "0%";
+  $("#scoreText").textContent = `${correct} / ${graded.size}`;
+}
+
+function renderSummary() {
+  $("#summaryGrid").innerHTML = units.map(([id, name, desc]) => {
+    const total = bank.filter(q => q.unit === id).length;
+    return `<article><h3>${name}</h3><p>${desc}</p><p><strong>${total}</strong> 問収録</p></article>`;
+  }).join("");
+}
+
+function renderBank() {
+  $("#bankCount").textContent = `${bank.length}問。レビュー由来形式とシラバス範囲を合わせた予想問題です。`;
+  $("#bankList").innerHTML = bank.map((item, i) => `<article class="bank-item"><h3>${i + 1}. ${item.text}</h3><p>${unitName(item.unit)} / ${item.type === "multi" ? "複数選択" : "単一選択"}</p></article>`).join("");
+}
+
+function init() {
+  $("#unitSelect").innerHTML = units.map(([id, name]) => `<option value="${id}">${name}</option>`).join("");
+  $("#startBtn").addEventListener("click", buildSet);
+  $("#gradeBtn").addEventListener("click", gradeAll);
+  $("#resetBtn").addEventListener("click", () => {
+    missed = [];
+    localStorage.removeItem("vizMissed");
+    graded.clear();
+    renderQuiz();
+  });
+  $("#retryWrongBtn").addEventListener("click", () => {
+    $("#modeSelect").value = "missed";
+    buildSet();
+  });
+  $$(".tab").forEach(btn => btn.addEventListener("click", () => {
+    $$(".tab").forEach(b => b.classList.remove("active"));
+    $$(".view").forEach(v => v.classList.remove("active"));
+    btn.classList.add("active");
+    $(`#${btn.dataset.view}View`).classList.add("active");
+  }));
+  renderSummary();
+  renderBank();
+  buildSet();
+}
+
+init();

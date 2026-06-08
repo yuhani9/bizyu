@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ビジュアライゼーション 予想問題トレーナー</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">Visualization Quiz Trainer</p>
+      <h1>ビジュアライゼーション 予想問題</h1>
+    </div>
+    <div class="scorebox" aria-live="polite">
+      <span id="scoreText">0 / 0</span>
+      <small>正答</small>
+    </div>
+  </header>
+
+  <main class="shell">
+    <aside class="panel controls" aria-label="出題設定">
+      <label>
+        出題モード
+        <select id="modeSelect">
+          <option value="mock">ランダム模試</option>
+          <option value="review">受験レビュー形式</option>
+          <option value="unit">分野別練習</option>
+          <option value="missed">ミス復習</option>
+        </select>
+      </label>
+      <label>
+        分野
+        <select id="unitSelect"></select>
+      </label>
+      <label>
+        問題数
+        <input id="countInput" type="number" min="3" max="80" value="20">
+      </label>
+      <div class="toggles">
+        <label><input id="shuffleOptions" type="checkbox" checked> 選択肢をシャッフル</label>
+        <label><input id="instantCheck" type="checkbox"> 1問ごとに採点</label>
+      </div>
+      <button id="startBtn" class="primary">出題を開始</button>
+      <button id="resetBtn">成績をリセット</button>
+      <div class="mini">
+        <strong>想定形式</strong>
+        <p>単一選択と複数選択。「最も適切」「すべて選べ」型を中心に作成。</p>
+      </div>
+    </aside>
+
+    <section class="workspace">
+      <nav class="tabs" aria-label="表示切替">
+        <button class="tab active" data-view="quiz">演習</button>
+        <button class="tab" data-view="summary">範囲メモ</button>
+        <button class="tab" data-view="bank">問題一覧</button>
+      </nav>
+
+      <section id="quizView" class="view active">
+        <div class="panel progress">
+          <div>
+            <span id="modeLabel">ランダム模試</span>
+            <strong id="progressLabel">未開始</strong>
+          </div>
+          <div class="bar"><span id="progressBar"></span></div>
+        </div>
+        <form id="quizForm" class="questions"></form>
+        <div class="actions">
+          <button id="gradeBtn" class="primary" type="button">まとめて採点</button>
+          <button id="retryWrongBtn" type="button">間違いだけ再出題</button>
+        </div>
+      </section>
+
+      <section id="summaryView" class="view">
+        <div class="panel">
+          <h2>シラバスから見た重点</h2>
+          <div class="format-note">
+            <strong>保存レビューから見えた4形式</strong>
+            <p>マントラ・用語定義・可視化分類・知覚/色の複数選択を重点形式として扱っています。</p>
+          </div>
+          <div class="summary-grid" id="summaryGrid"></div>
+        </div>
+      </section>
+
+      <section id="bankView" class="view">
+        <div class="panel">
+          <h2>収録問題</h2>
+          <p class="muted" id="bankCount"></p>
+          <div id="bankList" class="bank-list"></div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <template id="questionTemplate">
+    <article class="question-card">
+      <div class="question-head">
+        <span class="badge"></span>
+        <span class="unit"></span>
+      </div>
+      <h2></h2>
+      <p class="hint"></p>
+      <div class="options"></div>
+      <div class="feedback" hidden></div>
+    </article>
+  </template>
+
+  <script src="./app.js"></script>
+</body>
+</html>
